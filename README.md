@@ -30,6 +30,7 @@ The REST API to the event_maker app is described below.
 `POST /api/auth/signup/`
 
     curl --location --request POST 'http://event_maker.exp/api/auth/signup' \
+            --header 'Accept: application/json' \
             --header 'Content-Type: application/x-www-form-urlencoded' \
             --form 'name=default4' \
             --form 'email=default4@sample.com' \
@@ -55,6 +56,7 @@ The REST API to the event_maker app is described below.
 `POST /api/auth/login/`
 
    curl --location --request POST 'http://event_maker.exp/api/auth/login' \
+        --header 'Accept: application/json' \
         --header 'Content-Type: application/x-www-form-urlencoded' \
         --form 'user_name=09153456789' \
         --form 'password=secretsecret'
@@ -146,303 +148,157 @@ The REST API to the event_maker app is described below.
     {"id": 1,"name": "default1","phone_number": "09143456789","email": "default4@sample.com","picture": "/9j/4..."}
 
 
-## Create a new Thing
+## Create a new appointment
 
 ### Request
 
-`POST /thing/`
+`POST /api/appointments/`
 
-    curl -i -H 'Accept: application/json' -d 'name=Foo&status=new' http://localhost:7000/thing
-
-### Response
-
-    HTTP/1.1 201 Created
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
-    Status: 201 Created
-    Connection: close
-    Content-Type: application/json
-    Location: /thing/1
-    Content-Length: 36
-
-    {"id":1,"name":"Foo","status":"new"}
-
-## Get a specific Thing
-
-### Request
-
-`GET /thing/id`
-
-    curl -i -H 'Accept: application/json' http://localhost:7000/thing/1
+   curl --location --request POST 'http://event_maker.exp/api/appointments' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...' \
+        --form 'due_date=2020-02-29' \
+        --form 'title=sample_appoinment_title' \
+        --form 'info=sample_info' \
+        --form 'invitees[0]=1' \
+        --form 'invitees[1]=43'
 
 ### Response
 
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
+    HTTP/1.1 201 Created   
     Status: 200 OK
-    Connection: close
     Content-Type: application/json
-    Content-Length: 36
 
-    {"id":1,"name":"Foo","status":"new"}
+    {"id": 13,"user_id": 43,"due_date": "2020-02-29T00:00:00.000000Z","title": "sample_appoinment_title","info": "sample_info","invitees": [1,43]}
 
-## Get a non-existent Thing
+## Get list of appointments
 
 ### Request
 
-`GET /thing/id`
+`GET /api/appointments/`
 
-    curl -i -H 'Accept: application/json' http://localhost:7000/thing/9999
-
-### Response
-
-    HTTP/1.1 404 Not Found
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
-    Status: 404 Not Found
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 35
-
-    {"status":404,"reason":"Not found"}
-
-## Create another new Thing
-
-### Request
-
-`POST /thing/`
-
-    curl -i -H 'Accept: application/json' -d 'name=Bar&junk=rubbish' http://localhost:7000/thing
+    curl --location --request GET 'http://event_maker.exp/api/appointments' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
 
 ### Response
 
-    HTTP/1.1 201 Created
-    Date: Thu, 24 Feb 2011 12:36:31 GMT
-    Status: 201 Created
-    Connection: close
-    Content-Type: application/json
-    Location: /thing/2
-    Content-Length: 35
-
-    {"id":2,"name":"Bar","status":null}
-
-## Get list of Things again
-
-### Request
-
-`GET /thing/`
-
-    curl -i -H 'Accept: application/json' http://localhost:7000/thing/
-
-### Response
-
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:31 GMT
+    HTTP/1.1 200 OK   
     Status: 200 OK
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 74
 
-    [{"id":1,"name":"Foo","status":"new"},{"id":2,"name":"Bar","status":null}]
+    [{"id": 1,"title": "sample_appoinment_title","due_date": "2020-02-29 00:00:00"},]{"id": 2,"title": "sample_appoinment_title2","due_date": "2020-02-30 00:00:00"}
 
-## Change a Thing's state
+    
+
+## Get a specific appoinment
 
 ### Request
 
-`PUT /thing/:id/status/changed`
+`GET /api/appointments/id`
 
-    curl -i -H 'Accept: application/json' -X PUT http://localhost:7000/thing/1/status/changed
+    curl --location --request GET 'http://event_maker.exp/api/appointments/11' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
+### Response
+
+    HTTP/1.1 200 OK   
+    Status: 200 OK   
+    Content-Type: application/json  
+
+    {"id": 11,"user_id": 43,"due_date": "2020-02-29T00:00:00.000000Z","title": "sample_appoinment_title","info": "sample_info","invitees": [1,2]}
+
+## Get list of invitations
+
+### Request
+
+`GET /api/invitations/`
+
+    curl --location --request GET 'http://event_maker.exp/api/invitations' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
 
 ### Response
 
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:31 GMT
+    HTTP/1.1 200 OK   
     Status: 200 OK
-    Connection: close
+
+   [
+    {
+        "id": 12,
+        "title": "sample_appoinment_title",
+        "due_date": "2020-02-29 00:00:00",
+        "pivot": {
+            "user_id": 43,
+            "appointment_id": 12,
+            "created_at": "2020-02-29 18:06:58",
+            "updated_at": "2020-02-29 18:20:27",
+            "visited_at": "2020-02-29",
+            "status": 1
+        }
+    },
+    {
+        "id": 13,
+        "title": "sample_appoinment_title",
+        "due_date": "2020-02-29 00:00:00",
+        "pivot": {
+            "user_id": 43,
+            "appointment_id": 13,
+            "created_at": "2020-02-29 18:27:39",
+            "updated_at": "2020-02-29 18:27:39",
+            "visited_at": null,
+            "status": null
+        }
+    }
+]
+    
+
+## Get a specific invitation
+
+### Request
+
+`GET /api/invitations/id`
+
+    curl --location --request GET 'http://event_maker.exp/api/invitations/12' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
+### Response
+
+    HTTP/1.1 200 OK   
+    Status: 200 OK   
+    Content-Type: application/json  
+
+    {
+    "id": 12,
+    "user_id": 43,
+    "due_date": "2020-02-29T00:00:00.000000Z",
+    "title": "sample_appoinment_title",
+    "info": "sample_info",
+    "invitees": [
+        1,
+        43
+    ]
+}
+    
+
+## Change an invitations's state
+
+### 0 : rejected - 1 : accepted
+
+### Request
+
+`PATCH /thing/:id/status/changed`
+
+    curl --location --request PATCH 'http://event_maker.exp/api/invitations/12' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...' \
+        --data-urlencode 'status=1'
+
+### Response
+
+    HTTP/1.1 200 OK   
+    Status: 200 OK   
     Content-Type: application/json
-    Content-Length: 40
 
-    {"id":1,"name":"Foo","status":"changed"}
-
-## Get changed Thing
-
-### Request
-
-`GET /thing/id`
-
-    curl -i -H 'Accept: application/json' http://localhost:7000/thing/1
-
-### Response
-
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:31 GMT
-    Status: 200 OK
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 40
-
-    {"id":1,"name":"Foo","status":"changed"}
-
-## Change a Thing
-
-### Request
-
-`PUT /thing/:id`
-
-    curl -i -H 'Accept: application/json' -X PUT -d 'name=Foo&status=changed2' http://localhost:7000/thing/1
-
-### Response
-
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:31 GMT
-    Status: 200 OK
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 41
-
-    {"id":1,"name":"Foo","status":"changed2"}
-
-## Attempt to change a Thing using partial params
-
-### Request
-
-`PUT /thing/:id`
-
-    curl -i -H 'Accept: application/json' -X PUT -d 'status=changed3' http://localhost:7000/thing/1
-
-### Response
-
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:32 GMT
-    Status: 200 OK
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 41
-
-    {"id":1,"name":"Foo","status":"changed3"}
-
-## Attempt to change a Thing using invalid params
-
-### Request
-
-`PUT /thing/:id`
-
-    curl -i -H 'Accept: application/json' -X PUT -d 'id=99&status=changed4' http://localhost:7000/thing/1
-
-### Response
-
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:32 GMT
-    Status: 200 OK
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 41
-
-    {"id":1,"name":"Foo","status":"changed4"}
-
-## Change a Thing using the _method hack
-
-### Request
-
-`POST /thing/:id?_method=POST`
-
-    curl -i -H 'Accept: application/json' -X POST -d 'name=Baz&_method=PUT' http://localhost:7000/thing/1
-
-### Response
-
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:32 GMT
-    Status: 200 OK
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 41
-
-    {"id":1,"name":"Baz","status":"changed4"}
-
-## Change a Thing using the _method hack in the url
-
-### Request
-
-`POST /thing/:id?_method=POST`
-
-    curl -i -H 'Accept: application/json' -X POST -d 'name=Qux' http://localhost:7000/thing/1?_method=PUT
-
-### Response
-
-    HTTP/1.1 404 Not Found
-    Date: Thu, 24 Feb 2011 12:36:32 GMT
-    Status: 404 Not Found
-    Connection: close
-    Content-Type: text/html;charset=utf-8
-    Content-Length: 35
-
-    {"status":404,"reason":"Not found"}
-
-## Delete a Thing
-
-### Request
-
-`DELETE /thing/id`
-
-    curl -i -H 'Accept: application/json' -X DELETE http://localhost:7000/thing/1/
-
-### Response
-
-    HTTP/1.1 204 No Content
-    Date: Thu, 24 Feb 2011 12:36:32 GMT
-    Status: 204 No Content
-    Connection: close
-
-
-## Try to delete same Thing again
-
-### Request
-
-`DELETE /thing/id`
-
-    curl -i -H 'Accept: application/json' -X DELETE http://localhost:7000/thing/1/
-
-### Response
-
-    HTTP/1.1 404 Not Found
-    Date: Thu, 24 Feb 2011 12:36:32 GMT
-    Status: 404 Not Found
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 35
-
-    {"status":404,"reason":"Not found"}
-
-## Get deleted Thing
-
-### Request
-
-`GET /thing/1`
-
-    curl -i -H 'Accept: application/json' http://localhost:7000/thing/1
-
-### Response
-
-    HTTP/1.1 404 Not Found
-    Date: Thu, 24 Feb 2011 12:36:33 GMT
-    Status: 404 Not Found
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 35
-
-    {"status":404,"reason":"Not found"}
-
-## Delete a Thing using the _method hack
-
-### Request
-
-`DELETE /thing/id`
-
-    curl -i -H 'Accept: application/json' -X POST -d'_method=DELETE' http://localhost:7000/thing/2/
-
-### Response
-
-    HTTP/1.1 204 No Content
-    Date: Thu, 24 Feb 2011 12:36:33 GMT
-    Status: 204 No Content
-    Connection: close
-
-
+    {"id": 12,"user_id": 43,"due_date": "2020-02-29T00:00:00.000000Z","title": "sample_appoinment_title","info": "sample_info","invitees": [1,43]}
