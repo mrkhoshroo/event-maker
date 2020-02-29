@@ -3,6 +3,8 @@ simple event making system
 
 php artisan migrate
 php artisan passport:install
+phpunit
+
 -- Record Password grant client Credentials,
 (sample)
 ----------
