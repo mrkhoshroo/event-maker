@@ -47,7 +47,7 @@ The REST API to the event_maker app is described below.
     "message": "Registration successfull.."
     }
 
-## signup
+## login
 
 ### login
 
