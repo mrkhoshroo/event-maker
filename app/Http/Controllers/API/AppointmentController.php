@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\ResponseController;
 use App\Http\Resources\Appointment as AppointmentResource;
+use App\Http\Resources\Invitation as InvitationResource;
 
 class AppointmentController extends ResponseController
 {

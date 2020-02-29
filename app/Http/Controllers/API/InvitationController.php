@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\ResponseController;
 use App\Http\Resources\Appointment as AppointmentResource;
+use App\Http\Resources\Invitation as InvitationResource;
 
 
 class InvitationController extends ResponseController
@@ -22,8 +23,8 @@ class InvitationController extends ResponseController
      */
     public function index()
     {
-        $invitations = Auth::user()->invitations()
-            ->select('id', 'title', 'due_date')->get();
+        $invitations = InvitationResource::collection(Auth::user()->invitations);
+
         return $this->sendResponse($invitations);
     }
 
@@ -47,7 +48,7 @@ class InvitationController extends ResponseController
 
             DB::commit();
 
-            return $this->sendResponse(new AppointmentResource($appointment));
+            return $this->sendResponse(new AppointmentResource($appointment->refresh()));
         } catch (\Exception $e) {
 
             DB::rollback();
@@ -76,10 +77,21 @@ class InvitationController extends ResponseController
             $validator = Validator::make($input, [
                 'status' => [
                     'required',
-                    'integer',
-                    Rule::in([0, 1]),
+                    Rule::in(['rejected', 'accepted']),
                 ]
             ]);
+
+            switch ($input['status']) {
+                case 'rejected':
+                    $input['status'] = 0;
+                    break;
+                case 'accepted':
+                    $input['status'] = 1;
+                    break;
+                default:
+                    $input['status'] = 2;
+                    break;
+            }
 
             if ($validator->fails()) {
                 return $this->sendError($validator->errors());
@@ -91,7 +103,9 @@ class InvitationController extends ResponseController
 
             DB::commit();
 
-            return $this->sendResponse(new AppointmentResource($appointment));
+            $invitation = $appointment->invitees()->where('user_id', $user_id)->first();
+
+            return $this->sendResponse(new InvitationResource($invitation));
 
         } catch (\Exception $e) {
 

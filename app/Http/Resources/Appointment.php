@@ -3,6 +3,8 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Invitation as InvitationResource;
+
 
 class Appointment extends JsonResource
 {
@@ -20,7 +22,7 @@ class Appointment extends JsonResource
             'due_date' => $this->due_date,
             'title' => $this->title,
             'info' => $this->info,
-            'invitees' => $this->invitees->pluck('id')
+            'invitees' => InvitationResource::collection($this->invitees)
         ];
     }
 }

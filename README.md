@@ -170,7 +170,27 @@ The REST API to the event_maker app is described below.
     Status: 200 OK
     Content-Type: application/json
 
-    {"id": 13,"user_id": 43,"due_date": "2020-02-29T00:00:00.000000Z","title": "sample_appoinment_title","info": "sample_info","invitees": [1,43]}
+    {
+        "id": 15,
+        "user_id": 44,
+        "due_date": "2020-02-29T00:00:00.000000Z",
+        "title": "sample_appoinment_title",
+        "info": "sample_info",
+        "invitees": [
+            {
+                "user_id": 1,
+                "appointment_id": 15,
+                "visited": false,
+                "status": "unknown"
+            },
+            {
+                "user_id": 43,
+                "appointment_id": 15,
+                "visited": false,
+                "status": "unknown"
+            }
+        ]
+    }
 
 ## Get list of appointments
 
@@ -206,7 +226,27 @@ The REST API to the event_maker app is described below.
     Status: 200 OK   
     Content-Type: application/json  
 
-    {"id": 11,"user_id": 43,"due_date": "2020-02-29T00:00:00.000000Z","title": "sample_appoinment_title","info": "sample_info","invitees": [1,2]}
+    {
+        "id": 11,
+        "user_id": 43,
+        "due_date": "2020-02-29T00:00:00.000000Z",
+        "title": "sample_appoinment_title",
+        "info": "sample_info",
+        "invitees": [
+            {
+                "user_id": 1,
+                "appointment_id": 11,
+                "visited": false,
+                "status": "unknown"
+            },
+            {
+                "user_id": 2,
+                "appointment_id": 11,
+                "visited": false,
+                "status": "unknown"
+            }
+        ]
+    }
 
 ## Get list of invitations
 
@@ -224,35 +264,31 @@ The REST API to the event_maker app is described below.
     Status: 200 OK
     Content-Type: application/json
 
-    [{
-        "id": 12,
-        "title": "sample_appoinment_title",
-        "due_date": "2020-02-29 00:00:00",
-        "pivot": {
+    [
+        {
             "user_id": 43,
             "appointment_id": 12,
-            "created_at": "2020-02-29 18:06:58",
-            "updated_at": "2020-02-29 18:20:27",
-            "visited_at": "2020-02-29",
-            "status": 1
-        }
-     },
-     {
-        "id": 13,
-        "title": "sample_appoinment_title",
-        "due_date": "2020-02-29 00:00:00",
-        "pivot": {
+            "visited": true,
+            "status": "accepted"
+        },
+        {
             "user_id": 43,
             "appointment_id": 13,
-            "created_at": "2020-02-29 18:27:39",
-            "updated_at": "2020-02-29 18:27:39",
-            "visited_at": null,
-            "status": null
+            "visited": false,
+            "status": "unknown"
+        },
+        {
+            "user_id": 43,
+            "appointment_id": 14,
+            "visited": false,
+            "status": "unknown"
         }
-    }]
+    ]
     
 
 ## Get a specific invitation
+
+### "id" is the invitation's appointment_id
 
 ### Request
 
@@ -268,31 +304,43 @@ The REST API to the event_maker app is described below.
     Content-Type: application/json  
 
     {
-    "id": 12,
-    "user_id": 43,
-    "due_date": "2020-02-29T00:00:00.000000Z",
-    "title": "sample_appoinment_title",
-    "info": "sample_info",
-    "invitees": [
-        1,
-        43
-    ]
-}
+        "id": 12,
+        "user_id": 43,
+        "due_date": "2020-02-29T00:00:00.000000Z",
+        "title": "sample_appoinment_title",
+        "info": "sample_info",
+        "invitees": [
+            {
+                "user_id": 1,
+                "appointment_id": 12,
+                "visited": false,
+                "status": "unknown"
+            },
+            {
+                "user_id": 43,
+                "appointment_id": 12,
+                "visited": true,
+                "status": "accepted"
+            }
+        ]
+    }
     
 
 ## Change an invitations's state
 
-### 0 : rejected - 1 : accepted
+### "id" is the invitation's appointment_id
+
+###  valid status : 'rejected', 'accepted'
 
 ### Request
 
-`PATCH /thing/:id/status/changed`
+`PATCH /api/invitations/id`
 
     curl --location --request PATCH 'http://event_maker.exp/api/invitations/12' \
         --header 'Content-Type: application/x-www-form-urlencoded' \
         --header 'Accept: application/json' \
         --header 'Authorization: Bearer vbsfg...' \
-        --data-urlencode 'status=1'
+        --data-urlencode 'status=accepted'
 
 ### Response
 
@@ -300,4 +348,9 @@ The REST API to the event_maker app is described below.
     Status: 200 OK   
     Content-Type: application/json
 
-    {"id": 12,"user_id": 43,"due_date": "2020-02-29T00:00:00.000000Z","title": "sample_appoinment_title","info": "sample_info","invitees": [1,43]}
+    {
+        "user_id": 43,
+        "appointment_id": 15,
+        "visited": false,
+        "status": "accepted"
+    }
