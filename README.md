@@ -55,7 +55,7 @@ The REST API to the event_maker app is described below.
 
 `POST /api/auth/login/`
 
-   curl --location --request POST 'http://event_maker.exp/api/auth/login' \
+    curl --location --request POST 'http://event_maker.exp/api/auth/login' \
         --header 'Accept: application/json' \
         --header 'Content-Type: application/x-www-form-urlencoded' \
         --form 'user_name=09153456789' \
@@ -76,7 +76,7 @@ The REST API to the event_maker app is described below.
 
 `GET /api/auth/getuser/`
 
-   curl --location --request GET 'http://event_maker.exp/api/auth/getuser' \
+    curl --location --request GET 'http://event_maker.exp/api/auth/getuser' \
         --header 'Accept: application/json' \
         --header 'Authorization: Bearer vbsfg...'
 
@@ -99,7 +99,7 @@ The REST API to the event_maker app is described below.
 
 `GET /api/auth/logout/`
 
-   curl --location --request GET 'http://event_maker.exp/api/auth/logout' \
+    curl --location --request GET 'http://event_maker.exp/api/auth/logout' \
         --header 'Accept: application/json' \
         --header 'Authorization: Bearer vbsfg...'
 
@@ -154,7 +154,7 @@ The REST API to the event_maker app is described below.
 
 `POST /api/appointments/`
 
-   curl --location --request POST 'http://event_maker.exp/api/appointments' \
+    curl --location --request POST 'http://event_maker.exp/api/appointments' \
         --header 'Content-Type: application/x-www-form-urlencoded' \
         --header 'Accept: application/json' \
         --header 'Authorization: Bearer vbsfg...' \
@@ -288,7 +288,7 @@ The REST API to the event_maker app is described below.
 
 ## Get a specific invitation
 
-### "id" is the invitation's appointment_id
+    ### "id" is the invitation's appointment_id
 
 ### Request
 
@@ -328,9 +328,9 @@ The REST API to the event_maker app is described below.
 
 ## Change an invitations's state
 
-### "id" is the invitation's appointment_id
+    ### "id" is the invitation's appointment_id
 
-###  valid status : 'rejected', 'accepted'
+    ###  valid status : 'rejected', 'accepted'
 
 ### Request
 
