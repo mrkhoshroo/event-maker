@@ -326,7 +326,7 @@ The REST API to the event_maker app is described below.
     }
     
 
-## Change an invitations's state
+## Change an invitation's state
 
      "id" is the invitation's appointment_id
 
