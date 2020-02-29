@@ -20,7 +20,7 @@ class AppointmentController extends ResponseController
      */
     public function index()
     {
-        $appointments = Auth::user()->appointments()->select('id', 'title', 'dueـdate')->get();
+        $appointments = Auth::user()->appointments()->select('id', 'title', 'due_date')->get();
         return $this->sendResponse($appointments);
     }
 
