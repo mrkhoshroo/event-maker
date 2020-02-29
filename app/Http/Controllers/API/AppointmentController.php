@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -33,31 +34,45 @@ class AppointmentController extends ResponseController
      */
     public function store(Request $request)
     {
-        $input = $request->only(['due_date', 'title', 'info', 'invitees']);
+        DB::beginTransaction();
 
-        $validator = Validator::make($input, [
-            'due_date' => 'required|date',
-            'title' => 'required|string|max:255',
-            'info' => 'required|string',
-            'invitees' => 'required',
-            'invitees.*' => [
-                'required',
-                'integer',
-                Rule::in(User::pluck('id')),
-            ]
-        ]);
+        try {
 
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors());
+            $input = $request->only(['due_date', 'title', 'info', 'invitees']);
+
+            $validator = Validator::make($input, [
+                'due_date' => 'required|date',
+                'title' => 'required|string|max:255',
+                'info' => 'required|string',
+                'invitees' => 'required',
+                'invitees.*' => [
+                    'required',
+                    'integer',
+                    Rule::in(User::pluck('id')),
+                ]
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors());
+            }
+
+            $invitees = $input['invitees'];
+
+            $appointment = Auth::user()->appointments()->create($input);
+
+            $appointment->invitees()->attach($invitees);
+
+            DB::commit();
+
+            return $this->sendResponse(new AppointmentResource($appointment));
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            $error = $e->getMessage();
+            return $this->sendError($error, 500);
         }
-
-        $invitees = $input['invitees'];
-
-        $appointment = Auth::user()->appointments()->create($input);
-
-        $appointment->invitees()->attach($invitees);
-
-        return $this->sendResponse(new AppointmentResource($appointment));
     }
 
     /**

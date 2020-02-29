@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -34,16 +35,29 @@ class InvitationController extends ResponseController
      */
     public function show(Appointment $appointment)
     {
-        $this->authorize('update', $appointment);
+        DB::beginTransaction();
 
-        $user_id = Auth::user()->id;
+        try {
 
-        $appointment->invitees()->updateExistingPivot($user_id, ['visited_at' => now()]);
+            $this->authorize('update', $appointment);
 
-        return $this->sendResponse(new AppointmentResource($appointment));
+            $user_id = Auth::user()->id;
+
+            $appointment->invitees()->updateExistingPivot($user_id, ['visited_at' => now()]);
+
+            DB::commit();
+
+            return $this->sendResponse(new AppointmentResource($appointment));
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            $error = $e->getMessage();
+            return $this->sendError($error, 500);
+        }
     }
 
-        /**
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -52,26 +66,39 @@ class InvitationController extends ResponseController
      */
     public function update(Request $request, Appointment $appointment)
     {
-        $this->authorize('update', $appointment);
+        DB::beginTransaction();
 
-        $input = $request->only(['status']);
+        try {
+            $this->authorize('update', $appointment);
 
-        $validator = Validator::make($input, [
-            'status' => [
-                'required',
-                'integer',
-                Rule::in([0, 1]),
-            ]
-        ]);
+            $input = $request->only(['status']);
 
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors());
+            $validator = Validator::make($input, [
+                'status' => [
+                    'required',
+                    'integer',
+                    Rule::in([0, 1]),
+                ]
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors());
+            }
+
+            $user_id = Auth::user()->id;
+
+            $appointment->invitees()->updateExistingPivot($user_id, $input);
+
+            DB::commit();
+
+            return $this->sendResponse(new AppointmentResource($appointment));
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            $error = $e->getMessage();
+            return $this->sendError($error, 500);
         }
-
-        $user_id = Auth::user()->id;
-
-        $appointment->invitees()->updateExistingPivot($user_id, $input);
-
-        return $this->sendResponse(new AppointmentResource($appointment));
     }
 }

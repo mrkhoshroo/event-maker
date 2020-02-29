@@ -17,39 +17,53 @@ class AuthController extends ResponseController
     //create user
     public function signup(Request $request)
     {
-        $input = $request->all();
+        DB::beginTransaction();
 
-        $validator = Validator::make($input, [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'phone_number' => 'required|regex:/(09)[0-9]{9}/|max:11|unique:users',
-            'picture' => 'sometimes|image|required|max:10000',
-            'password' => 'required|string|min:8|confirmed',
-            //password_confirmation
-            // 'confirm_password' => 'required|same:password'
-        ]);
+        try {
 
-        if ($validator->fails()) {
-            return $this->sendError($validator->errors());
-        }
+            $input = $request->all();
 
-        $input['password'] = Hash::make($input['password']);
+            $validator = Validator::make($input, [
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'phone_number' => 'required|regex:/(09)[0-9]{9}/|max:11|unique:users',
+                'picture' => 'sometimes|image|required|max:10000',
+                'password' => 'required|string|min:8|confirmed',
+                //password_confirmation
+                // 'confirm_password' => 'required|same:password'
+            ]);
 
-        $picture = $request->file('picture');
+            if ($validator->fails()) {
+                return $this->sendError($validator->errors());
+            }
 
-        if ($picture) {
-            $input['picture'] = $picture->store('profile_pictures');
-        }
+            $input['password'] = Hash::make($input['password']);
 
-        $user = User::create($input);
+            $picture = $request->file('picture');
 
-        if ($user) {
-            $success['token'] =  $user->createToken('token')->accessToken;
-            $success['message'] = "Registration successfull..";
-            return $this->sendResponse($success);
-        } else {
-            $error = "Sorry! Registration is not successfull.";
-            return $this->sendError($error, 401);
+            if ($picture) {
+                $input['picture'] = $picture->store('profile_pictures');
+            }
+
+            $user = User::create($input);
+
+            if ($user) {
+                $success['token'] =  $user->createToken('token')->accessToken;
+                $success['message'] = "Registration successfull..";
+
+                DB::commit();
+
+                return $this->sendResponse($success);
+            } else {
+                $error = "Sorry! Registration is not successfull.";
+                return $this->sendError($error, 401);
+            }
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            $error = $e->getMessage();
+            return $this->sendError($error, 500);
         }
     }
 
