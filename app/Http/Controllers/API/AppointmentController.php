@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\ResponseController;
@@ -71,5 +72,4 @@ class AppointmentController extends ResponseController
 
         return $this->sendResponse(new AppointmentResource($appointment));
     }
-
 }

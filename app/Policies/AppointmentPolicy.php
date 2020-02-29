@@ -53,7 +53,7 @@ class AppointmentPolicy
      */
     public function update(User $user, Appointment $appointment)
     {
-        return in_array($user->id, $appointment->invitees->pluck('id'));
+        return in_array($user->id, $appointment->invitees->pluck('id')->all());
     }
 
     /**

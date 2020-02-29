@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\ResponseController;
@@ -21,7 +22,7 @@ class InvitationController extends ResponseController
     public function index()
     {
         $invitations = Auth::user()->invitations()
-            ->select('id', 'title', 'due_date', 'pivot.visited_at as visited_at', 'pivot.status as status')->get();
+            ->select('id', 'title', 'due_date')->get();
         return $this->sendResponse($invitations);
     }
 
