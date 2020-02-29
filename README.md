@@ -1,90 +1,149 @@
-# event-maker
-simple event making system
+#  event-maker
 
-php artisan migrate
-php artisan passport:install
-phpunit
+This is a simple event making system able to set appointments with certain invitees.
 
--- Record Password grant client Credentials,
-(sample)
-----------
-# Client ID: 
-# Client secret: 
-----------
-(login)
------------------------
-$http = new GuzzleHttp\Client;
+all docker-compose files are contained within the laradock folder.
 
-$response = $http->post('http://your-app.com/oauth/token', [
-    'form_params' => [
-        'grant_type' => 'password',
-        'client_id' => 'client-id',
-        'client_secret' => 'client-secret',
-        'username' => 'taylor@laravel.com',
-        'password' => 'my-password',
-        'scope' => '',
-    ],
-]);
+## Install & Run the app
 
-return json_decode((string) $response->getBody(), true);
------------------------
-(passing access token)
---------------------------
-$response = $client->request('GET', '/api/user', [
-    'headers' => [
-        'Accept' => 'application/json',
-        'Authorization' => 'Bearer '.$accessToken,
-    ],
---------------------------
-# REST API example application
+    cd laradock
+    docker-compose up -d workspace nginx mysql
 
-This is a bare-bones example of a Sinatra application providing a REST
-API to a DataMapper-backed model.
+    composer install
 
-The entire application is contained within the `app.rb` file.
-
-`config.ru` is a minimal Rack configuration for unicorn.
-
-`run-tests.sh` runs a simplistic test and generates the API
-documentation below.
-
-It uses `run-curl-tests.rb` which runs each command defined in
-`commands.yml`.
-
-## Install
-
-    bundle install
-
-## Run the app
-
-    unicorn -p 7000
+    php artisan migrate
+    php artisan passport:install
 
 ## Run the tests
 
-    ./run-tests.sh
+    phpunit
 
 # REST API
 
-The REST API to the example app is described below.
+The REST API to the event_maker app is described below.
 
-## Get list of Things
+## signup
 
 ### Request
 
-`GET /thing/`
+`POST /api/auth/signup/`
 
-    curl -i -H 'Accept: application/json' http://localhost:7000/thing/
+    curl --location --request POST 'http://event_maker.exp/api/auth/signup' \
+            --header 'Content-Type: application/x-www-form-urlencoded' \
+            --form 'name=default4' \
+            --form 'email=default4@sample.com' \
+            --form 'phone_number=09143456789' \
+            --form 'password=secretsecret' \
+            --form 'password_confirmation=secretsecret' \
+            --form 'picture=@/home/pictures/s1QK2.jpg'
 
 ### Response
 
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
-    Status: 200 OK
-    Connection: close
-    Content-Type: application/json
-    Content-Length: 2
+    HTTP/1.1 200 OK    
+    Status: 200 OK    
 
-    []
+    {
+    "token": "vbsfg...",
+    "message": "Registration successfull.."
+    }
+
+## signup
+
+### login
+
+`POST /api/auth/login/`
+
+   curl --location --request POST 'http://event_maker.exp/api/auth/login' \
+        --header 'Content-Type: application/x-www-form-urlencoded' \
+        --form 'user_name=09153456789' \
+        --form 'password=secretsecret'
+
+### Response
+
+    HTTP/1.1 200 OK    
+    Status: 200 OK    
+
+    {
+    "token": "vbsfg...",    
+    }
+
+## get current user
+
+### getuser
+
+`GET /api/auth/getuser/`
+
+   curl --location --request GET 'http://event_maker.exp/api/auth/getuser' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
+
+### Response
+
+    HTTP/1.1 200 OK    
+    Status: 200 OK    
+
+    {
+        "id": 2,
+        "name": "default4",
+        "phone_number": "09153456789",
+        "email": "default5@sample.com",
+        "picture": "/9j/4AAQ..."
+    }
+
+## logout
+
+### logout
+
+`GET /api/auth/logout/`
+
+   curl --location --request GET 'http://event_maker.exp/api/auth/logout' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
+
+### Response
+
+    HTTP/1.1 200 OK    
+    Status: 200 OK    
+
+    {
+       "message": "Successfully logged out."
+    }
+
+## Get list of users
+
+### Request
+
+`GET /api/users/`
+
+    curl --location --request GET 'http://event_maker.exp/api/users' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
+
+### Response
+
+    HTTP/1.1 200 OK   
+    Status: 200 OK
+
+    [{"id": 1,"name": "default1"},{"id": 2,"name": "default3"},{"id": 3,"name": default4"}]
+
+
+## Get a specific user
+
+### Request
+
+`GET /api/users/id`
+
+    curl --location --request GET 'http://event_maker.exp/api/users/1' \
+        --header 'Accept: application/json' \
+        --header 'Authorization: Bearer vbsfg...'
+
+### Response
+
+    HTTP/1.1 200 OK   
+    Status: 200 OK
+
+    {"id": 1,"name": "default1","phone_number": "09143456789","email": "default4@sample.com","picture": "/9j/4..."}
+
 
 ## Create a new Thing
 
