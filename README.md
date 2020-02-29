@@ -288,7 +288,7 @@ The REST API to the event_maker app is described below.
 
 ## Get a specific invitation
 
-    ### "id" is the invitation's appointment_id
+     "id" is the invitation's appointment_id
 
 ### Request
 
@@ -328,9 +328,9 @@ The REST API to the event_maker app is described below.
 
 ## Change an invitations's state
 
-    ### "id" is the invitation's appointment_id
+     "id" is the invitation's appointment_id
 
-    ###  valid status : 'rejected', 'accepted'
+      valid status : 'rejected', 'accepted'
 
 ### Request
 
