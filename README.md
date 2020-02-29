@@ -222,9 +222,9 @@ The REST API to the event_maker app is described below.
 
     HTTP/1.1 200 OK   
     Status: 200 OK
+    Content-Type: application/json
 
-   [
-    {
+    [{
         "id": 12,
         "title": "sample_appoinment_title",
         "due_date": "2020-02-29 00:00:00",
@@ -236,8 +236,8 @@ The REST API to the event_maker app is described below.
             "visited_at": "2020-02-29",
             "status": 1
         }
-    },
-    {
+     },
+     {
         "id": 13,
         "title": "sample_appoinment_title",
         "due_date": "2020-02-29 00:00:00",
@@ -249,8 +249,7 @@ The REST API to the event_maker app is described below.
             "visited_at": null,
             "status": null
         }
-    }
-]
+    }]
     
 
 ## Get a specific invitation
