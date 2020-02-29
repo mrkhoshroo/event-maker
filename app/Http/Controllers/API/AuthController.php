@@ -10,13 +10,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\ResponseController as ResponseController;
+use App\Http\Resources\User as UserResource;
 
 class AuthController extends ResponseController
 {
     //create user
     public function signup(Request $request)
     {
-        $input = $request->all;
+        $input = $request->all();
 
         $validator = Validator::make($input, [
             'name' => 'required|string|max:255',
@@ -35,7 +36,7 @@ class AuthController extends ResponseController
         $input['password'] = Hash::make($input['password']);
 
         $picture = $request->file('picture');
-        
+
         if ($picture) {
             $input['picture'] = $picture->store('profile_pictures');
         }
@@ -100,7 +101,7 @@ class AuthController extends ResponseController
         //$id = $request->user()->id;
         $user = $request->user();
         if ($user) {
-            return $this->sendResponse($user);
+            return $this->sendResponse(new UserResource($user));
         } else {
             $error = "user not found";
             return $this->sendResponse($error);
