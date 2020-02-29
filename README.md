@@ -9,6 +9,7 @@ all docker-compose files are contained within the laradock folder.
     cd laradock
     docker-compose up -d workspace nginx mysql
 
+    mv .env.example .env
     composer install
 
     php artisan migrate

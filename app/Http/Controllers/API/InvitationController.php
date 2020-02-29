@@ -21,7 +21,7 @@ class InvitationController extends ResponseController
     public function index()
     {
         $invitations = Auth::user()->invitations()
-            ->select('id', 'title', 'due-date', 'pivot.visited_at as visited_at', 'pivot.status as status')->get();
+            ->select('id', 'title', 'dueـdate', 'pivot.visited_at as visited_at', 'pivot.status as status')->get();
         return $this->sendResponse($invitations);
     }
 
